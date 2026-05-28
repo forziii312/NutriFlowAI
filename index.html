@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriFlow Pro - AI Nutrition Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a7d5c;
+            --primary-dark: #0f5c47;
+            --primary-light: #4cbba1;
+            --secondary: #ff6b6b;
+            --accent: #ffd93d;
+            --bg-main: #f8f9fa;
+            --bg-card: #ffffff;
+            --border: #e0e0e0;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --success: #51cf66;
+            --warning: #ffa94d;
+            --danger: #ff6b6b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--bg-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .navbar-icons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .language-selector {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-main);
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .language-selector:hover {
+            border-color: var(--primary);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg-card);
+            padding: 0.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .daily-stats {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(26, 125, 92, 0.2);
+        }
+
+        .daily-stats h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .meal-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meal-info h3 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .meal-macros {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .meal-macro {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .macro-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .meal-calories {
+            text-align: right;
+            padding: 0.75rem;
+            background: var(--bg-main);
+            border-radius: 8px;
+            min-width: 70px;
+        }
+
+        .calorie-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .calorie-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .upload-section {
+            background: var(--bg-card);
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-section:hover {
+            background: linear-gradient(135deg, rgba(26, 125, 92, 0.05), rgba(76, 187, 161, 0.05));
+            border-color: var(--primary-light);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-section h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .upload-section p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 125, 92, 0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(26, 125, 92, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-main);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            width: auto;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            max-width: 100%;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .analysis-result {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .analysis-items {
+            margin-bottom: 1.5rem;
+        }
+
+        .analysis-item {
+            padding: 1rem;
+            background: var(--bg-main);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .analysis-macros {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .macro-box {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-main);
+            border-radius: 8px;
+        }
+
+        .macro-box-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .macro-box-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(26, 125, 92, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0.5rem 0;
+            max-width: 480px;
+            margin: 0 auto;
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.75rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+            text-decoration: none;
+            font-size: 0.75rem;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .alert-success {
+            background: rgba(81, 207, 102, 0.1);
+            color: #2d7e3f;
+            border: 1px solid rgba(81, 207, 102, 0.3);
+        }
+
+        .alert-error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #c92a2a;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .alert-info {
+            background: rgba(26, 125, 92, 0.1);
+            color: #0f5c47;
+            border: 1px solid rgba(26, 125, 92, 0.3);
+        }
+
+        .api-key-input {
+            margin-bottom: 1rem;
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .confidence-high {
+            background: rgba(81, 207, 102, 0.2);
+            color: #2d7e3f;
+        }
+
+        .confidence-medium {
+            background: rgba(255, 169, 77, 0.2);
+            color: #d97706;
+        }
+
+        .confidence-low {
+            background: rgba(255, 107, 107, 0.2);
+            color: #c92a2a;
+        }
+
+        .mt-1 { margin-top: 1rem; }
+        .mt-2 { margin-top: 2rem; }
+        .mb-1 { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <div class="navbar">
+            <h1>🥗 NutriFlow Pro</h1>
+            <div class="navbar-icons">
+                <select class="language-selector" id="languageSelect" onchange="changeLanguage(this.value)">
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="de">🇩🇪 Deutsch</option>
+                    <option value="fr">🇫🇷 Français</option>
+                </select>
+                <button class="icon-btn" onclick="openModal('settingsModal')">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('dashboard')" data-key="tab_dashboard">
+                    📊 Дашборд
+                </button>
+                <button class="tab-btn" onclick="switchTab('tracker')" data-key="tab_tracker">
+                    ➕ Трекер
+                </button>
+                <button class="tab-btn" onclick="switchTab('profile')" data-key="tab_profile">
+                    👤 Профиль
+                </button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content">
+                <div class="daily-stats">
+                    <h2 data-key="today">Сегодня</h2>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-value" id="dailyCalories">0</div>
+                            <div class="stat-label" data-key="stat_consumed">ккал съедено</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="caloriesRemaining">2000</div>
+                            <div class="stat-label" data-key="stat_remaining">осталось</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="proteinValue">0g</div>
+                            <div class="stat-label" data-key="stat_protein">Белки</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="carbsValue">0g</div>
+                            <div class="stat-label" data-key="stat_carbs">Углеводы</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 1rem;" data-key="meals_today">Твои блюда</h3>
+                <div id="mealsList">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                        <p data-key="no_meals">Пока нет добавленных блюд</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tracker Tab -->
+            <div id="tracker" class="tab-content hidden">
+                <div id="apiKeyAlert" class="alert alert-info hidden">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong data-key="api_key_info">Требуется API ключ</strong><br>
+                        <small data-key="api_key_desc">Введи свой ключ Anthropic для анализа изображений</small>
+                    </div>
+                </div>
+
+                <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📸</div>
+                    <h3 data-key="upload_title">Загрузить фото блюда</h3>
+                    <p data-key="upload_desc">Нажми, чтобы загрузить фото или выбрать из галереи</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleImageUpload(event)">
+
+                <div id="analysisContainer" class="hidden"></div>
+
+                <div style="background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;" data-key="manual_entry">Добавить блюдо вручную</h3>
+                    <div class="form-group">
+                        <label data-key="meal_name">Название блюда</label>
+                        <input type="text" id="mealName" placeholder="Например: Куриный салат">
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label data-key="calories">Калории</label>
+                            <input type="number" id="mealCalories" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label data-key="protein">Белки (г)</label>
+                            <input type="number" id="mealProtein" placeholder="0" min="0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label data-key="fat">Жиры (г)</label>
+                            <input type="number" id="mealFat" placeholder="0" min="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label data-key="carbs">Углеводы (г)</label>
+                            <input type="number" id="mealCarbs" placeholder="0" min="0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-key="meal_type">Тип приема пищи</label>
+                        <select id="mealType">
+                            <option value="breakfast" data-key="breakfast">Завтрак</option>
+                            <option value="lunch" selected data-key="lunch">Обед</option>
+                            <option value="dinner" data-key="dinner">Ужин</option>
+                            <option value="snack" data-key="snack">Перекус</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary mt-1" onclick="addMealManually()" data-key="add_meal">Добавить блюдо</button>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile" class="tab-content hidden">
+                <div style="background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;" data-key="profile_data">Твои данные</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label data-key="age">Возраст</label>
+                            <input type="number" id="profileAge" placeholder="25" min="13" max="120">
+                        </div>
+                        <div class="form-group">
+                            <label data-key="gender">Пол</label>
+                            <select id="profileGender">
+                                <option value="male" data-key="male">Мужской</option>
+                                <option value="female" data-key="female">Женский</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label data-key="weight">Вес (кг)</label>
+                            <input type="number" id="profileWeight" placeholder="70" min="30" max="200" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label data-key="height">Рост (см)</label>
+                            <input type="number" id="profileHeight" placeholder="180" min="120" max="250">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-key="goal">Цель</label>
+                        <select id="profileGoal">
+                            <option value="lose_weight" data-key="lose_weight">Похудение</option>
+                            <option value="maintain" selected data-key="maintain">Поддержание</option>
+                            <option value="gain_muscle" data-key="gain_muscle">Набор массы</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-key="activity">Активность</label>
+                        <select id="profileActivity">
+                            <option value="sedentary" data-key="activity_sedentary">Низкая (офисная работа)</option>
+                            <option value="light" data-key="activity_light">Легкая (спорт 2-3 раза)</option>
+                            <option value="moderate" selected data-key="activity_moderate">Средняя (спорт 4-5 раз)</option>
+                            <option value="high" data-key="activity_high">Высокая (спорт 6+ раз)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary mt-1" onclick="saveProfile()" data-key="save_profile">Сохранить профиль</button>
+                </div>
+
+                <div style="background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;" data-key="daily_limit">Дневной лимит калорий</h3>
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary);" id="dailyCalorieLimit">2000</div>
+                        <div style="color: var(--text-secondary); margin-top: 0.5rem;" data-key="kcal_per_day">ккал в день</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('dashboard')">
+                <div class="nav-icon">📊</div>
+                <span data-key="dashboard">Дашборд</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('tracker')">
+                <div class="nav-icon">➕</div>
+                <span data-key="add">Добавить</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('profile')">
+                <div class="nav-icon">👤</div>
+                <span data-key="profile">Профиль</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-key="settings">Настройки</h2>
+                <button class="modal-close" onclick="closeModal('settingsModal')">✕</button>
+            </div>
+
+            <div class="form-group api-key-input">
+                <label data-key="api_key_label">Anthropic API ключ</label>
+                <input type="password" id="apiKeyInput" placeholder="sk-ant-..." onchange="saveAPIKey(this.value)">
+                <small style="color: var(--text-secondary); margin-top: 0.5rem; display: block;" data-key="api_key_help">
+                    Получи ключ на console.anthropic.com
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label data-key="units">Единицы измерения</label>
+                <select id="unitsSelect" onchange="saveUnits(this.value)">
+                    <option value="metric" data-key="units_metric">Метрические (кг, см)</option>
+                    <option value="imperial" data-key="units_imperial">Имперские (фунты, дюймы)</option>
+                </select>
+            </div>
+
+            <button class="btn btn-secondary mt-2" onclick="resetData()" data-key="clear_data">Очистить все данные</button>
+            <button class="btn btn-secondary mt-1" onclick="closeModal('settingsModal')" data-key="close">Закрыть</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <script>
+        // ===== TRANSLATIONS =====
+        const translations = {
+            ru: {
+                tab_dashboard: '📊 Дашборд',
+                tab_tracker: '➕ Трекер',
+                tab_profile: '👤 Профиль',
+                today: 'Сегодня',
+                stat_consumed: 'ккал съедено',
+                stat_remaining: 'осталось',
+                stat_protein: 'Белки',
+                stat_carbs: 'Углеводы',
+                meals_today: 'Твои блюда',
+                no_meals: 'Пока нет добавленных блюд',
+                upload_title: 'Загрузить фото блюда',
+                upload_desc: 'Нажми, чтобы загрузить фото или выбрать из галереи',
+                manual_entry: 'Добавить блюдо вручную',
+                meal_name: 'Название блюда',
+                calories: 'Калории',
+                protein: 'Белки (г)',
+                fat: 'Жиры (г)',
+                carbs: 'Углеводы (г)',
+                meal_type: 'Тип приема пищи',
+                breakfast: 'Завтрак',
+                lunch: 'Обед',
+                dinner: 'Ужин',
+                snack: 'Перекус',
+                add_meal: 'Добавить блюдо',
+                profile_data: 'Твои данные',
+                age: 'Возраст',
+                gender: 'Пол',
+                male: 'Мужской',
+                female: 'Женский',
+                weight: 'Вес (кг)',
+                height: 'Рост (см)',
+                goal: 'Цель',
+                lose_weight: 'Похудение',
+                maintain: 'Поддержание',
+                gain_muscle: 'Набор массы',
+                activity: 'Активность',
+                activity_sedentary: 'Низкая (офисная работа)',
+                activity_light: 'Легкая (спорт 2-3 раза)',
+                activity_moderate: 'Средняя (спорт 4-5 раз)',
+                activity_high: 'Высокая (спорт 6+ раз)',
+                save_profile: 'Сохранить профиль',
+                daily_limit: 'Дневной лимит калорий',
+                kcal_per_day: 'ккал в день',
+                dashboard: 'Дашборд',
+                add: 'Добавить',
+                profile: 'Профиль',
+                settings: 'Настройки',
+                api_key_label: 'Anthropic API ключ',
+                api_key_help: 'Получи ключ на console.anthropic.com',
+                api_key_info: 'Требуется API ключ',
+                api_key_desc: 'Введи свой ключ Anthropic для анализа изображений',
+                units: 'Единицы измерения',
+                units_metric: 'Метрические (кг, см)',
+                units_imperial: 'Имперские (фунты, дюймы)',
+                clear_data: 'Очистить все данные',
+                close: 'Закрыть',
+                analyzing: 'Анализирую изображение...',
+                meal_added: 'Блюдо добавлено!',
+                meal_deleted: 'Блюдо удалено',
+                profile_saved: 'Профиль сохранен!',
+                error_no_image: 'Не удалось распознать блюдо',
+                error_api: 'Ошибка API. Проверь ключ.',
+                analyzed_items: 'Распознанные ингредиенты',
+                total_macros: 'Итого макронутриенты',
+                image_analysis: 'Анализ изображения',
+                add_to_meals: 'Добавить в блюда'
+            },
+            en: {
+                tab_dashboard: '📊 Dashboard',
+                tab_tracker: '➕ Tracker',
+                tab_profile: '👤 Profile',
+                today: 'Today',
+                stat_consumed: 'kcal eaten',
+                stat_remaining: 'remaining',
+                stat_protein: 'Protein',
+                stat_carbs: 'Carbs',
+                meals_today: 'Your meals',
+                no_meals: 'No meals added yet',
+                upload_title: 'Upload food photo',
+                upload_desc: 'Click to upload a photo or choose from gallery',
+                manual_entry: 'Add meal manually',
+                meal_name: 'Meal name',
+                calories: 'Calories',
+                protein: 'Protein (g)',
+                fat: 'Fat (g)',
+                carbs: 'Carbs (g)',
+                meal_type: 'Meal type',
+                breakfast: 'Breakfast',
+                lunch: 'Lunch',
+                dinner: 'Dinner',
+                snack: 'Snack',
+                add_meal: 'Add meal',
+                profile_data: 'Your data',
+                age: 'Age',
+                gender: 'Gender',
+                male: 'Male',
+                female: 'Female',
+                weight: 'Weight (kg)',
+                height: 'Height (cm)',
+                goal: 'Goal',
+                lose_weight: 'Weight loss',
+                maintain: 'Maintenance',
+                gain_muscle: 'Muscle gain',
+                activity: 'Activity',
+                activity_sedentary: 'Low (office work)',
+                activity_light: 'Light (2-3x sports)',
+                activity_moderate: 'Moderate (4-5x sports)',
+                activity_high: 'High (6+ sports)',
+                save_profile: 'Save profile',
+                daily_limit: 'Daily calorie limit',
+                kcal_per_day: 'kcal per day',
+                dashboard: 'Dashboard',
+                add: 'Add',
+                profile: 'Profile',
+                settings: 'Settings',
+                api_key_label: 'Anthropic API key',
+                api_key_help: 'Get your key at console.anthropic.com',
+                api_key_info: 'API key required',
+                api_key_desc: 'Enter your Anthropic key for image analysis',
+                units: 'Units',
+                units_metric: 'Metric (kg, cm)',
+                units_imperial: 'Imperial (lbs, inches)',
+                clear_data: 'Clear all data',
+                close: 'Close',
+                analyzing: 'Analyzing image...',
+                meal_added: 'Meal added!',
+                meal_deleted: 'Meal deleted',
+                profile_saved: 'Profile saved!',
+                error_no_image: 'Could not recognize food',
+                error_api: 'API error. Check your key.',
+                analyzed_items: 'Recognized items',
+                total_macros: 'Total macros',
+                image_analysis: 'Image analysis',
+                add_to_meals: 'Add to meals'
+            },
+            es: {
+                tab_dashboard: '📊 Dashboard',
+                tab_tracker: '➕ Rastreador',
+                tab_profile: '👤 Perfil',
+                today: 'Hoy',
+                stat_consumed: 'kcal consumidas',
+                stat_remaining: 'restantes',
+                stat_protein: 'Proteína',
+                stat_carbs: 'Carbohidratos',
+                meals_today: 'Tus comidas',
+                no_meals: 'Sin comidas añadidas',
+                upload_title: 'Subir foto de comida',
+                upload_desc: 'Haz clic para subir una foto',
+                manual_entry: 'Añadir comida manualmente',
+                meal_name: 'Nombre de la comida',
+                calories: 'Calorías',
+                protein: 'Proteína (g)',
+                fat: 'Grasas (g)',
+                carbs: 'Carbohidratos (g)',
+                meal_type: 'Tipo de comida',
+                breakfast: 'Desayuno',
+                lunch: 'Almuerzo',
+                dinner: 'Cena',
+                snack: 'Bocadillo',
+                add_meal: 'Añadir comida',
+                profile_data: 'Tus datos',
+                age: 'Edad',
+                gender: 'Género',
+                male: 'Masculino',
+                female: 'Femenino',
+                weight: 'Peso (kg)',
+                height: 'Altura (cm)',
+                goal: 'Objetivo',
+                lose_weight: 'Perder peso',
+                maintain: 'Mantenimiento',
+                gain_muscle: 'Ganar músculo',
+                activity: 'Actividad',
+                activity_sedentary: 'Baja (trabajo de oficina)',
+                activity_light: 'Ligera (2-3x deporte)',
+                activity_moderate: 'Moderada (4-5x deporte)',
+                activity_high: 'Alta (6+ deporte)',
+                save_profile: 'Guardar perfil',
+                daily_limit: 'Límite calórico diario',
+                kcal_per_day: 'kcal por día',
+                dashboard: 'Dashboard',
+                add: 'Añadir',
+                profile: 'Perfil',
+                settings: 'Configuración',
+                api_key_label: 'Clave API de Anthropic',
+                api_key_help: 'Obtén tu clave en console.anthropic.com',
+                api_key_info: 'Se requiere clave API',
+                api_key_desc: 'Introduce tu clave de Anthropic',
+                units: 'Unidades',
+                units_metric: 'Métrico (kg, cm)',
+                units_imperial: 'Imperial (lbs, pulgadas)',
+                clear_data: 'Limpiar datos',
+                close: 'Cerrar',
+                analyzing: 'Analizando imagen...',
+                meal_added: '¡Comida añadida!',
+                meal_deleted: 'Comida eliminada',
+                profile_saved: '¡Perfil guardado!',
+                error_no_image: 'No se pudo reconocer la comida',
+                error_api: 'Error de API. Verifica tu clave.',
+                analyzed_items: 'Elementos reconocidos',
+                total_macros: 'Macros totales',
+                image_analysis: 'Análisis de imagen',
+                add_to_meals: 'Añadir a comidas'
+            },
+            de: {
+                tab_dashboard: '📊 Dashboard',
+                tab_tracker: '➕ Tracker',
+                tab_profile: '👤 Profil',
+                today: 'Heute',
+                stat_consumed: 'kcal gegessen',
+                stat_remaining: 'verbleibend',
+                stat_protein: 'Protein',
+                stat_carbs: 'Kohlenhydrate',
+                meals_today: 'Deine Mahlzeiten',
+                no_meals: 'Noch keine Mahlzeiten',
+                upload_title: 'Lebensmittelfoto hochladen',
+                upload_desc: 'Klicke zum Hochladen eines Fotos',
+                manual_entry: 'Mahlzeit manuell hinzufügen',
+                meal_name: 'Mahlzeitenname',
+                calories: 'Kalorien',
+                protein: 'Protein (g)',
+                fat: 'Fett (g)',
+                carbs: 'Kohlenhydrate (g)',
+                meal_type: 'Mahlzeitentyp',
+                breakfast: 'Frühstück',
+                lunch: 'Mittagessen',
+                dinner: 'Abendessen',
+                snack: 'Snack',
+                add_meal: 'Mahlzeit hinzufügen',
+                profile_data: 'Deine Daten',
+                age: 'Alter',
+                gender: 'Geschlecht',
+                male: 'Männlich',
+                female: 'Weiblich',
+                weight: 'Gewicht (kg)',
+                height: 'Höhe (cm)',
+                goal: 'Ziel',
+                lose_weight: 'Gewichtsverlust',
+                maintain: 'Wartung',
+                gain_muscle: 'Muskelaufbau',
+                activity: 'Aktivität',
+                activity_sedentary: 'Niedrig (Büroarbeit)',
+                activity_light: 'Leicht (2-3x Sport)',
+                activity_moderate: 'Moderat (4-5x Sport)',
+                activity_high: 'Hoch (6+ Sport)',
+                save_profile: 'Profil speichern',
+                daily_limit: 'Tägliches Kalorienbudget',
+                kcal_per_day: 'kcal pro Tag',
+                dashboard: 'Dashboard',
+                add: 'Hinzufügen',
+                profile: 'Profil',
+                settings: 'Einstellungen',
+                api_key_label: 'Anthropic API-Schlüssel',
+                api_key_help: 'Holen Sie Ihren Schlüssel unter console.anthropic.com',
+                api_key_info: 'API-Schlüssel erforderlich',
+                api_key_desc: 'Geben Sie Ihren Anthropic-Schlüssel ein',
+                units: 'Einheiten',
+                units_metric: 'Metrisch (kg, cm)',
+                units_imperial: 'Imperial (lbs, Zoll)',
+                clear_data: 'Daten löschen',
+                close: 'Schließen',
+                analyzing: 'Bild wird analysiert...',
+                meal_added: 'Mahlzeit hinzugefügt!',
+                meal_deleted: 'Mahlzeit gelöscht',
+                profile_saved: 'Profil gespeichert!',
+                error_no_image: 'Lebensmittel konnte nicht erkannt werden',
+                error_api: 'API-Fehler. Überprüfen Sie Ihren Schlüssel.',
+                analyzed_items: 'Erkannte Elemente',
+                total_macros: 'Gesamtmakros',
+                image_analysis: 'Bildanalyse',
+                add_to_meals: 'Zu Mahlzeiten hinzufügen'
+            },
+            fr: {
+                tab_dashboard: '📊 Tableau de bord',
+                tab_tracker: '➕ Suivi',
+                tab_profile: '👤 Profil',
+                today: "Aujourd'hui",
+                stat_consumed: 'kcal consommées',
+                stat_remaining: 'restantes',
+                stat_protein: 'Protéine',
+                stat_carbs: 'Glucides',
+                meals_today: 'Tes repas',
+                no_meals: 'Aucun repas ajouté',
+                upload_title: 'Télécharger une photo de nourriture',
+                upload_desc: 'Clique pour télécharger une photo',
+                manual_entry: 'Ajouter un repas manuellement',
+                meal_name: 'Nom du repas',
+                calories: 'Calories',
+                protein: 'Protéine (g)',
+                fat: 'Lipides (g)',
+                carbs: 'Glucides (g)',
+                meal_type: 'Type de repas',
+                breakfast: 'Petit-déjeuner',
+                lunch: 'Déjeuner',
+                dinner: 'Dîner',
+                snack: 'Collation',
+                add_meal: 'Ajouter un repas',
+                profile_data: 'Tes données',
+                age: 'Âge',
+                gender: 'Sexe',
+                male: 'Masculin',
+                female: 'Féminin',
+                weight: 'Poids (kg)',
+                height: 'Taille (cm)',
+                goal: 'Objectif',
+                lose_weight: 'Perte de poids',
+                maintain: 'Maintien',
+                gain_muscle: 'Prise de muscle',
+                activity: 'Activité',
+                activity_sedentary: 'Faible (travail de bureau)',
+                activity_light: 'Légère (2-3x sport)',
+                activity_moderate: 'Modérée (4-5x sport)',
+                activity_high: 'Élevée (6+ sport)',
+                save_profile: 'Enregistrer le profil',
+                daily_limit: 'Limite calorique quotidienne',
+                kcal_per_day: 'kcal par jour',
+                dashboard: 'Tableau de bord',
+                add: 'Ajouter',
+                profile: 'Profil',
+                settings: 'Paramètres',
+                api_key_label: 'Clé API Anthropic',
+                api_key_help: 'Obtenez votre clé sur console.anthropic.com',
+                api_key_info: 'Clé API requise',
+                api_key_desc: 'Entrez votre clé Anthropic',
+                units: 'Unités',
+                units_metric: 'Métrique (kg, cm)',
+                units_imperial: 'Impérial (lbs, pouces)',
+                clear_data: 'Effacer les données',
+                close: 'Fermer',
+                analyzing: 'Analyse de l\'image...',
+                meal_added: 'Repas ajouté!',
+                meal_deleted: 'Repas supprimé',
+                profile_saved: 'Profil enregistré!',
+                error_no_image: 'Impossible de reconnaître la nourriture',
+                error_api: 'Erreur API. Vérifiez votre clé.',
+                analyzed_items: 'Éléments reconnus',
+                total_macros: 'Macros totales',
+                image_analysis: 'Analyse d\'image',
+                add_to_meals: 'Ajouter aux repas'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('nutriflow_language') || 'ru';
+        let appData = {
+            profile: {
+                age: 25,
+                gender: 'male',
+                weight: 70,
+                height: 180,
+                goal: 'maintain',
+                activity: 'moderate'
+            },
+            meals: [],
+            createdDate: new Date().toDateString(),
+            apiKey: localStorage.getItem('nutriflow_api_key') || ''
+        };
+
+        // ===== INITIALIZATION =====
+        function init() {
+            loadData();
+            loadProfileUI();
+            calculateAndUpdateStats();
+            changeLanguage(currentLanguage);
+            document.getElementById('languageSelect').value = currentLanguage;
+            document.getElementById('apiKeyInput').value = appData.apiKey;
+            
+            // Показать алерт если нет API ключа
+            const apiKeyAlert = document.getElementById('apiKeyAlert');
+            if (!appData.apiKey) {
+                apiKeyAlert.classList.remove('hidden');
+            } else {
+                apiKeyAlert.classList.add('hidden');
+            }
+        }
+
+        // ===== LANGUAGE MANAGEMENT =====
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('nutriflow_language', lang);
+            
+            document.querySelectorAll('[data-key]').forEach(elem => {
+                const key = elem.getAttribute('data-key');
+                const trans = translations[lang] || translations.ru;
+                if (trans[key]) {
+                    if (elem.tagName === 'OPTION') {
+                        elem.textContent = trans[key];
+                    } else if (elem.children.length === 0) {
+                        elem.textContent = trans[key];
+                    }
+                }
+            });
+
+            document.documentElement.lang = lang;
+        }
+
+        function getTranslation(key) {
+            const trans = translations[currentLanguage] || translations.ru;
+            return trans[key] || key;
+        }
+
+        // ===== DATA MANAGEMENT =====
+        function loadData() {
+            const stored = localStorage.getItem('nutriflow_data');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (parsed.createdDate !== new Date().toDateString()) {
+                    parsed.meals = [];
+                    parsed.createdDate = new Date().toDateString();
+                }
+                appData = { ...appData, ...parsed };
+            } else {
+                saveData();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('nutriflow_data', JSON.stringify(appData));
+        }
+
+        function saveAPIKey(key) {
+            appData.apiKey = key;
+            localStorage.setItem('nutriflow_api_key', key);
+            const apiKeyAlert = document.getElementById('apiKeyAlert');
+            if (key) {
+                apiKeyAlert.classList.add('hidden');
+            } else {
+                apiKeyAlert.classList.remove('hidden');
+            }
+        }
+
+        function saveUnits(units) {
+            localStorage.setItem('nutriflow_units', units);
+        }
+
+        // ===== PROFILE MANAGEMENT =====
+        function loadProfileUI() {
+            document.getElementById('profileAge').value = appData.profile.age;
+            document.getElementById('profileGender').value = appData.profile.gender;
+            document.getElementById('profileWeight').value = appData.profile.weight;
+            document.getElementById('profileHeight').value = appData.profile.height;
+            document.getElementById('profileGoal').value = appData.profile.goal;
+            document.getElementById('profileActivity').value = appData.profile.activity;
+        }
+
+        function saveProfile() {
+            appData.profile = {
+                age: parseInt(document.getElementById('profileAge').value) || 25,
+                gender: document.getElementById('profileGender').value,
+                weight: parseFloat(document.getElementById('profileWeight').value) || 70,
+                height: parseInt(document.getElementById('profileHeight').value) || 180,
+                goal: document.getElementById('profileGoal').value,
+                activity: document.getElementById('profileActivity').value
+            };
+            saveData();
+            calculateAndUpdateStats();
+            showNotification(getTranslation('profile_saved'));
+        }
+
+        // ===== CALORIE CALCULATION =====
+        function calculateDailyLimit() {
+            const { age, weight, height, gender, goal, activity } = appData.profile;
+            
+            let bmr;
+            if (gender === 'male') {
+                bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+            } else {
+                bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            }
+
+            const activityMultipliers = {
+                sedentary: 1.2,
+                light: 1.375,
+                moderate: 1.55,
+                high: 1.725
+            };
+
+            const tdee = bmr * (activityMultipliers[activity] || 1.55);
+
+            const goalAdjustments = {
+                lose_weight: 0.85,
+                maintain: 1.0,
+                gain_muscle: 1.15
+            };
+
+            return Math.round(tdee * (goalAdjustments[goal] || 1.0));
+        }
+
+        function calculateAndUpdateStats() {
+            const dailyLimit = calculateDailyLimit();
+            const totalCalories = appData.meals.reduce((sum, meal) => sum + meal.calories, 0);
+            const totalProtein = appData.meals.reduce((sum, meal) => sum + meal.protein, 0);
+            const totalFat = appData.meals.reduce((sum, meal) => sum + meal.fat, 0);
+            const totalCarbs = appData.meals.reduce((sum, meal) => sum + meal.carbs, 0);
+
+            const remaining = dailyLimit - totalCalories;
+            const progress = Math.min((totalCalories / dailyLimit) * 100, 100);
+
+            document.getElementById('dailyCalories').textContent = Math.round(totalCalories);
+            document.getElementById('caloriesRemaining').textContent = Math.max(Math.round(remaining), 0);
+            document.getElementById('proteinValue').textContent = Math.round(totalProtein) + 'g';
+            document.getElementById('carbsValue').textContent = Math.round(totalCarbs) + 'g';
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('dailyCalorieLimit').textContent = dailyLimit;
+
+            updateMealsList();
+        }
+
+        function updateMealsList() {
+            const mealsList = document.getElementById('mealsList');
+            if (appData.meals.length === 0) {
+                mealsList.innerHTML = `<div style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                    <p>${getTranslation('no_meals')}</p>
+                </div>`;
+                return;
+            }
+
+            mealsList.innerHTML = appData.meals.map((meal, idx) => `
+                <div class="meal-card">
+                    <div class="meal-info">
+                        <h3>${meal.name}</h3>
+                        <div class="meal-macros">
+                            <div class="meal-macro">
+                                <span style="color: var(--text-secondary);">Б</span>
+                                <span class="macro-value">${meal.protein.toFixed(1)}г</span>
+                            </div>
+                            <div class="meal-macro">
+                                <span style="color: var(--text-secondary);">Ж</span>
+                                <span class="macro-value">${meal.fat.toFixed(1)}г</span>
+                            </div>
+                            <div class="meal-macro">
+                                <span style="color: var(--text-secondary);">У</span>
+                                <span class="macro-value">${meal.carbs.toFixed(1)}г</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="meal-calories">
+                        <div class="calorie-value">${Math.round(meal.calories)}</div>
+                        <div class="calorie-label">ккал</div>
+                        <button class="btn btn-secondary btn-small" style="margin-top: 0.5rem;" onclick="removeMeal(${idx})">✕</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== IMAGE ANALYSIS WITH CLAUDE API =====
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!appData.apiKey) {
+                showError(getTranslation('api_key_info'));
+                openModal('settingsModal');
+                return;
+            }
+
+            showNotification(getTranslation('analyzing'));
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64Image = e.target.result.split(',')[1];
+
+                try {
+                    const response = await axios.post(
+                        'https://api.anthropic.com/v1/messages',
+                        {
+                            model: 'claude-3-5-sonnet-20241022',
+                            max_tokens: 1500,
+                            messages: [{
+                                role: 'user',
+                                content: [
+                                    {
+                                        type: 'image',
+                                        source: {
+                                            type: 'base64',
+                                            media_type: 'image/jpeg',
+                                            data: base64Image
+                                        }
+                                    },
+                                    {
+                                        type: 'text',
+                                        text: `Analyze this food image in detail. Calculate nutritional values based on standard portions visible in the image.
+
+Respond with ONLY a valid JSON object (no markdown, no extra text):
+{
+  "status": "success",
+  "items": [
+    {
+      "name": "Food item name",
+      "weight_g": estimated weight,
+      "calories": total calories,
+      "protein_g": protein grams,
+      "fat_g": fat grams,
+      "carbs_g": carbs grams
+    }
+  ],
+  "confidence": "high/medium/low",
+  "notes": "What you see in the image"
+}
+
+Requirements:
+1. Identify ALL visible food components
+2. Estimate portions realistically (standard plate ~25cm)
+3. Use accurate nutritional database values
+4. Be precise with macronutrients
+5. If unsure about any item, mark confidence as medium or low`
+                                    }
+                                ]
+                            }]
+                        },
+                        {
+                            headers: {
+                                'x-api-key': appData.apiKey,
+                                'anthropic-version': '2023-06-01'
+                            }
+                        }
+                    );
+
+                    const content = response.data.content[0].text;
+                    const jsonMatch = content.match(/\{[\s\S]*\}/);
+                    
+                    if (!jsonMatch) {
+                        showError(getTranslation('error_no_image'));
+                        return;
+                    }
+
+                    const analysis = JSON.parse(jsonMatch[0]);
+                    displayAnalysisResults(analysis);
+
+                } catch (error) {
+                    console.error('API Error:', error);
+                    if (error.response?.status === 401) {
+                        showError(getTranslation('error_api'));
+                        openModal('settingsModal');
+                    } else {
+                        showError(error.message);
+                    }
+                }
+            };
+
+            reader.readAsDataURL(file);
+            document.getElementById('fileInput').value = '';
+        }
+
+        function displayAnalysisResults(analysis) {
+            const container = document.getElementById('analysisContainer');
+            
+            let totalCalories = 0, totalProtein = 0, totalFat = 0, totalCarbs = 0;
+            
+            analysis.items.forEach(item => {
+                totalCalories += item.calories;
+                totalProtein += item.protein_g;
+                totalFat += item.fat_g;
+                totalCarbs += item.carbs_g;
+            });
+
+            const confidenceClass = `confidence-${analysis.confidence}`;
+            const confidenceText = analysis.confidence.charAt(0).toUpperCase() + analysis.confidence.slice(1);
+
+            const html = `
+                <div class="analysis-result">
+                    <h3>${getTranslation('image_analysis')}</h3>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>${analysis.notes}</strong><br>
+                            <span class="confidence-badge ${confidenceClass}">${getTranslation('analyzing')}: ${confidenceText}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-items">
+                        <h4>${getTranslation('analyzed_items')}</h4>
+                        ${analysis.items.map(item => `
+                            <div class="analysis-item">
+                                <div>
+                                    <strong>${item.name}</strong><br>
+                                    <small>${item.weight_g}g</small>
+                                </div>
+                                <div style="text-align: right;">
+                                    <strong>${Math.round(item.calories)} kcal</strong>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="analysis-macros">
+                        <div class="macro-box">
+                            <div class="macro-box-value">${Math.round(totalCalories)}</div>
+                            <div class="macro-box-label">${getTranslation('calories')}</div>
+                        </div>
+                        <div class="macro-box">
+                            <div class="macro-box-value">${Math.round(totalProtein)}g</div>
+                            <div class="macro-box-label">${getTranslation('protein')}</div>
+                        </div>
+                        <div class="macro-box">
+                            <div class="macro-box-value">${Math.round(totalFat)}g</div>
+                            <div class="macro-box-label">${getTranslation('fat')}</div>
+                        </div>
+                        <div class="macro-box">
+                            <div class="macro-box-value">${Math.round(totalCarbs)}g</div>
+                            <div class="macro-box-label">${getTranslation('carbs')}</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary mt-2" onclick="addAnalyzedMeal('${analysis.items.map(i => i.name).join(' + ')}', ${totalCalories}, ${totalProtein}, ${totalFat}, ${totalCarbs})">
+                        ${getTranslation('add_to_meals')}
+                    </button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            container.classList.remove('hidden');
+        }
+
+        function addAnalyzedMeal(name, calories, protein, fat, carbs) {
+            const meal = {
+                name: name,
+                calories: Math.round(calories),
+                protein: parseFloat(protein),
+                fat: parseFloat(fat),
+                carbs: parseFloat(carbs),
+                type: 'lunch',
+                timestamp: new Date().toISOString()
+            };
+
+            appData.meals.push(meal);
+            saveData();
+            calculateAndUpdateStats();
+            showNotification(getTranslation('meal_added'));
+            document.getElementById('analysisContainer').classList.add('hidden');
+            switchTab('dashboard');
+        }
+
+        function addMealManually() {
+            const meal = {
+                name: document.getElementById('mealName').value || 'Meal',
+                calories: parseInt(document.getElementById('mealCalories').value) || 0,
+                protein: parseFloat(document.getElementById('mealProtein').value) || 0,
+                fat: parseFloat(document.getElementById('mealFat').value) || 0,
+                carbs: parseFloat(document.getElementById('mealCarbs').value) || 0,
+                type: document.getElementById('mealType').value,
+                timestamp: new Date().toISOString()
+            };
+
+            appData.meals.push(meal);
+            saveData();
+            calculateAndUpdateStats();
+
+            document.getElementById('mealName').value = '';
+            document.getElementById('mealCalories').value = '';
+            document.getElementById('mealProtein').value = '';
+            document.getElementById('mealFat').value = '';
+            document.getElementById('mealCarbs').value = '';
+
+            showNotification(getTranslation('meal_added'));
+            switchTab('dashboard');
+        }
+
+        function removeMeal(idx) {
+            appData.meals.splice(idx, 1);
+            saveData();
+            calculateAndUpdateStats();
+            showNotification(getTranslation('meal_deleted'));
+        }
+
+        // ===== UI FUNCTIONS =====
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+            document.getElementById(tabName).classList.remove('hidden');
+
+            const tabIndex = ['dashboard', 'tracker', 'profile'].indexOf(tabName);
+            document.querySelectorAll('.tab-btn')[tabIndex]?.classList.add('active');
+            document.querySelectorAll('.nav-item')[tabIndex]?.classList.add('active');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--primary);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 2000;
+                animation: slideDown 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function showError(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--danger);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 2000;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 4000);
+        }
+
+        function resetData() {
+            if (confirm(getTranslation('clear_data') + '?')) {
+                localStorage.removeItem('nutriflow_data');
+                appData.meals = [];
+                saveData();
+                calculateAndUpdateStats();
+                closeModal('settingsModal');
+            }
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+        });
+
+        init();
+    </script>
+</body>
+</html>
